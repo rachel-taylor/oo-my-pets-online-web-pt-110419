@@ -1,70 +1,72 @@
-require 'pry'
-require_relative 'cat.rb'
-require_relative 'fish.rb'
-require_relative 'dog.rb'
-
-class Owner	
- 	attr_reader :species
-   attr_accessor :name , :pets
-
-    def initialize(species)
-     @species = species
-     @name = name
-     @pets = { :cats => [], :dogs => []}
-     @@all << self
-   end
-   @@all = []
-
- 
-    def say_species
-     "I am a #{@species}."
-   end
-
-    def buy_cat(cat)
-     new_cat =Cat.new(cat)
-     @pets[:cats] << new_cat
-   end
-
-    def buy_dog(dog)
-     new_dog = Dog.new(dog)
-     @pets[:dogs] << new_dog
-   end
-
-    def walk_dogs
-     @pets[:dogs].each do |dog|
-       dog.mood = "happy"
-     end
-   end
-
-    def play_with_cats
-     @pets[:cats].each do |cat|
-       cat.mood = "happy"
-     end
-   end
-
-    def sell_pets
-     @pets.values.each do |type|
-       type.each do |pet_mood|
-         pet_mood.mood = "nervous"
-       end
-       type.clear
-     end
-   end
-
-    def list_pets
-     "I have #{@pets[:dogs].size} dog(s), and #{@pets[:cats].size} cat(s)."
-
+class Owner
+  attr_reader :name, :species
+  
+  @reset_all = []
+  @@all = []
+  
+  def initialize(name)
+    @name = name
+    @species = "human"
+    @@all << self
+  end
+  
+  def say_species
+    "I am a #{@species}."
+  end
+  
+  def self.all
+    @@all
+  end
+  
+  def self.count
+   @@all.size{|num|num}
+  end
+  
+  def self.reset_all
+    @@all.clear
+  end
+  
+  def cats 
+    Cat.all.select{|cat| cat.owner == self}
+  end
+  
+  def dogs 
+    Dog.all.select{|dog| dog.owner == self}
+  end
+  
+  def buy_cat(name)
+    Cat.new(name,self)
+  end
+  
+  def buy_dog(name)
+    Dog.new(name,self)
+  end
+  
+  def walk_dogs
+    Dog.all.select do |dog|
+      dog.mood = "happy"
     end
-
-    def self.all
-     @@all
-   end
-
-    def self.count
-     return @@all.size
-   end
-
-    def self.reset_all
-     return @@all.clear
-   end
+  end
+    
+    def feed_cats
+      Cat.all.select do |cat|
+        cat.mood = "happy"
+      end
+  end
+  
+  def sell_pets
+    Dog.all.select do |dog|
+      dog.mood = "nervous"
+      dog.owner = nil
+    end
+    
+    Cat.all.select do |cat|
+      cat.mood = "nervous"
+      cat.owner = nil
+    end
+  end
+  
+  def list_pets
+    "I have #{self.dogs.count} dog(s), and #{self.cats.count} cat(s)."
+  end
 end
